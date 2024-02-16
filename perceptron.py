@@ -1,21 +1,18 @@
+import numpy as np
+
 class Perceptron:
     def __init__(self, inputs, weights, bias) -> None:
-        self.inputs = inputs
-        self.weights = weights
+        self.inputs = np.array(inputs)
+        self.weights = np.array(weights)
         self.bias = bias
         self.output = self.compute_output()
 
     def compute_output(self):
         if len(self.weights) != len(self.inputs):
             raise ValueError("weights and biases must be of same length")
-        z = 0.0
-        for i in range(len(self.inputs)):
-            z += self.inputs[i] * self.weights[i]
+        z = np.dot(self.weights, self.inputs)
         z += self.bias
-        if z >= 0:
-            return 1
-        else:
-            return -1
+        return np.sign(z)
 
 
 def main():
