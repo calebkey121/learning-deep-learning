@@ -4,7 +4,7 @@ def logistic_sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 class Neuron:
-    def __init__(self, input_len: int, inputs: list | None = None, weights: list | None = None, activation_name: str = "tanh") -> None:
+    def __init__(self, input_len: int, inputs: list | None = None, activation_name: str = "tanh") -> None:
         """
         Initializes a Neuron instance with given inputs, optional weights, and an activation function.
 
@@ -12,9 +12,6 @@ class Neuron:
             input_len (int): The number of inputs 
             inputs (Optional[List[float]]): A list of input values for the neuron. These are the inputs from the previous layer 
                                             or the initial inputs to the network. They may be set, but are updated during forward pass
-            weights (Optional[List[float]]): A list of weights corresponding to the inputs. The length of `weights` must 
-                                             match the length of `inputs` if provided. If None, weights will be initialized 
-                                             randomly within a range of -1.0 to 1.0.
             activation_name (str): The name of the activation function to use. Supported values are "tanh" for the 
                                    hyperbolic tangent function and any other value defaults to the logistic sigmoid function. 
                                    This parameter determines how the neuron's output is calculated from its weighted inputs.
@@ -34,11 +31,7 @@ class Neuron:
             self.inputs = np.array(inputs)
         else:
             self.inputs = None
-        if weights:
-            assert len(weights) == input_len
-            self.weights = np.array(weights)
-        else: # randomize
-            self.weights = np.random.uniform(-1.0, 1.0, input_len)
+        self.weights = np.random.uniform(-0.1, 0.1, input_len)
         self.activation_name = activation_name # we separate the name and the actual function here because comparing functions is tricky
         self.activation_function = np.tanh if activation_name == "tanh" else logistic_sigmoid
         self.output = None
@@ -68,11 +61,11 @@ class Neuron:
     def update_weights(self, lr, error_term):
         num_weights = len(self.weights)
         for weight in range(num_weights):
-            old_weight = self.weights[weight]
+            #old_weight = self.weights[weight]
             delta = -lr * self.inputs[weight] * error_term
             self.weights[weight] += delta
-            new_weight = self.weights[weight]
-            print(f"old weight: {old_weight}, new weight: {round(new_weight, 4)}")
+            #new_weight = self.weights[weight]
+            #print(f"old weight: {old_weight}, new weight: {round(new_weight, 4)}")
             
 
 
