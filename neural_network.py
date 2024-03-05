@@ -69,7 +69,7 @@ class NeuralNetwork():
                 output = self.network[layer][neuron].update_inputs(inputs)
                 layer_output.append(output)
             inputs = layer_output
-        self.output_layer = layer_output[1:] # output layer (has a bias term for hidden layers not needed for output)
+        self.output_layer = np.array(layer_output[1:]) # output layer (has a bias term for hidden layers not needed for output)
     
 
     def backward_pass(self, expected):
@@ -131,50 +131,62 @@ class NeuralNetwork():
         """
         This training loop is for one hot encoded output, the highest output should match the highest expected
         """
-        index_list = list(range(len(self.x_train[0])))
-        for i in range(epochs):
+        index_list = list(range(len(self.x_train)))
+        results = []
+        for epoch in range(epochs):
             np.random.shuffle(index_list)
             correct_training_results = 0
+            i = 0
             for j in index_list:
                 self.forward_pass(self.x_train[j])
-                if max(self.output_layer) == max(self.y_train[j]):
+                if self.output_layer.argmax() == self.y_train[j].argmax():
                     correct_training_results += 1
                 self.backward_pass(self.y_train[j])
                 self.update_weights()
+                i += 1
+                print(f"Epoch {epoch + 1} - training loop: {i} / {len(index_list)}")
 
             correct_test_results = 0
+            i = 0
             for j in range(len(self.x_test)):
                 self.forward_pass(self.x_test[j])
-                if max(self.output_layer) == max(self.y_test[j]):
+                if self.output_layer.argmax() == self.y_test[j].argmax():
                     correct_test_results += 1
+                i += 1
+                print(f"Epoch {epoch + 1} - testing loop: {i} / {len(index_list)}")
+
+            results.append((correct_training_results, correct_test_results))
+        for i, result in enumerate(results):
+            train, test = result
+            print(f"Epoch {i + 1}: correct training = {train} / 60,000 - {(train / 60000) * 100}%")
+            print(f"Epoch {i + 1}: correct test = {test} / 10,000 - {(test / 10000) * 100}%")
             
-            print(f"correct training = {correct_training_results}")
-            print(f"correct test = {correct_test_results}")
+            
             
 
 def main():
-    x_train = [
+    x_train = np.array([
         [1,1,1],
         [0,0,0],
         [0.8,0.8,0.8],
         [0.1,0.1,0.1]
-    ]
-    y_train = [
+    ])
+    y_train = np.array([
         [0,1],
         [1,0],
         [0,1],
         [1,0]
-    ]
-    x_test = [
+    ])
+    x_test = np.array([
         [1,1,1],
         [0,0,0],
         [0.5,0.5,0.5],
-    ]
-    y_test = [
+    ])
+    y_test = np.array([
         [0,0],
         [1,1],
         [0.5,0.5],
-    ]
+    ])
     a = NeuralNetwork (
         [4,2],
         x_train,
@@ -183,7 +195,7 @@ def main():
         y_test,
         learning_rate=0.1
     )
-    a.training_loop(epochs=1)
+    a.training_loop(epochs=3)
 
 if __name__ == "__main__":
     main()
